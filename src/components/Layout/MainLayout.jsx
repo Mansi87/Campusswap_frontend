@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import TopBar from './Topbar.jsx';
+import TopBar from './TopBar.jsx';
 import BottomNav from './BottomNav.jsx';
 
 export default function MainLayout() {
