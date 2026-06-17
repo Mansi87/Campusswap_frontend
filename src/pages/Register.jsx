@@ -1,6 +1,8 @@
-// Register.jsx
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLayout from '../components/Layout/AuthLayout.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import API from '../api/axios.js';
 
 const RegisterLeft = () => (
   <>
@@ -11,7 +13,6 @@ const RegisterLeft = () => (
         </div>
         <span className="text-2xl font-bold">CampusSwap</span>
       </div>
-
       <ul className="mt-6 space-y-2 text-sm">
         {[
           'College-Verified Students Only',
@@ -26,7 +27,6 @@ const RegisterLeft = () => (
         ))}
       </ul>
     </div>
-
     <div>
       <p className="text-2xl font-bold">2,000+</p>
       <p className="text-xs opacity-90">Students Already Using CampusSwap</p>
@@ -40,9 +40,38 @@ const RegisterLeft = () => (
 );
 
 export default function Register() {
-  const handleSubmit = (e) => {
+  const { register } = useAuth();
+  const [colleges, setColleges]   = useState([]);
+  const [formData, setFormData]   = useState({
+    fullName: '', email: '', password: '',
+    phone: '', collegeId: ''
+  });
+  const [error, setError]         = useState('');
+  const [loading, setLoading]     = useState(false);
+
+  // Load colleges from backend
+  useEffect(() => {
+    API.get('/api/test/colleges')
+      .then(res => setColleges(res.data))
+      .catch(() => setColleges([]));
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Account created! (front-end demo only)');
+    setError('');
+    setLoading(true);
+    try {
+      await register(formData);
+      // AuthContext handles redirect to /
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,12 +93,34 @@ export default function Register() {
         Join your campus marketplace in minutes.
       </p>
 
+      {error && (
+        <div className="mt-3 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="mt-4 space-y-3 text-sm">
+        <label className="flex flex-col gap-1 text-slate-700">
+          Full Name
+          <input
+            type="text"
+            name="fullName"
+            required
+            value={formData.fullName}
+            onChange={handleChange}
+            className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
+            placeholder="Your full name"
+          />
+        </label>
+
         <label className="flex flex-col gap-1 text-slate-700">
           College Email
           <input
             type="email"
+            name="email"
             required
+            value={formData.email}
+            onChange={handleChange}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
             placeholder="yourname@college.edu"
           />
@@ -78,13 +129,18 @@ export default function Register() {
         <label className="flex flex-col gap-1 text-slate-700">
           Select Your College
           <select
+            name="collegeId"
             required
+            value={formData.collegeId}
+            onChange={handleChange}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
           >
             <option value="">Choose your college...</option>
-            <option>ABC Engineering College</option>
-            <option>XYZ University</option>
-            <option>Other</option>
+            {colleges.map(college => (
+              <option key={college.id} value={college.id}>
+                {college.name}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -92,7 +148,9 @@ export default function Register() {
           Phone Number
           <input
             type="tel"
-            required
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
             placeholder="+91 98765 43210"
           />
@@ -102,7 +160,10 @@ export default function Register() {
           Password
           <input
             type="password"
+            name="password"
             required
+            value={formData.password}
+            onChange={handleChange}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
             placeholder="Create a strong password"
           />
@@ -110,14 +171,15 @@ export default function Register() {
 
         <label className="flex items-start gap-2 text-xs text-slate-600">
           <input type="checkbox" required className="mt-1" />
-          <span>I agree to Terms &amp; Conditions and Community Guidelines</span>
+          <span>I agree to Terms & Conditions and Community Guidelines</span>
         </label>
 
         <button
           type="submit"
-          className="mt-2 w-full rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple px-4 py-2 text-sm font-medium text-white"
+          disabled={loading}
+          className="mt-2 w-full rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
-          Create Account
+          {loading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
 
@@ -127,13 +189,8 @@ export default function Register() {
           Login
         </Link>
       </p>
-
       <p className="mt-2 text-[11px] text-slate-400">
         🔒 Secure • 🏫 College-Only • 🚫 No Outsiders
-      </p>
-
-      <p className="mt-2 text-[11px] text-slate-500">
-        <Link to="/">← Back to Home</Link>
       </p>
     </AuthLayout>
   );

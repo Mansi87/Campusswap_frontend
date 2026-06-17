@@ -21,11 +21,11 @@ export default function BottomNav() {
       </Link>
 
       <Link
-        to="/explore"
-        className="flex h-14 w-14 -translate-y-5 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-brandPurple text-3xl text-white shadow-xl"
-      >
-        +
-      </Link>
+  to="/create-listing"
+  className="flex h-14 w-14 -translate-y-5 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-brandPurple text-3xl text-white shadow-xl"
+>
+  +
+</Link>
 
       <Link to="/explore" className={itemClasses('/explore')}>
         <span>🔍</span>

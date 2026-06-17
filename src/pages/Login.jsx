@@ -1,6 +1,7 @@
-// Login.jsx
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLayout from '../components/Layout/AuthLayout.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const LoginLeft = () => (
   <>
@@ -17,10 +18,9 @@ const LoginLeft = () => (
         Within Your Campus!
       </h1>
       <p className="mt-4 max-w-xs text-sm opacity-90">
-        Join thousands of students saving money and reducing waste by trading
-        second-hand items safely within your college community.
+        Join thousands of students saving money by trading
+        second-hand items within your college community.
       </p>
-
       <ul className="mt-6 space-y-2 text-sm">
         {[
           'College-Verified Students Only',
@@ -35,7 +35,6 @@ const LoginLeft = () => (
         ))}
       </ul>
     </div>
-
     <div>
       <p className="text-2xl font-bold">2,000+</p>
       <p className="text-xs opacity-90">Students Already Using CampusSwap</p>
@@ -49,9 +48,24 @@ const LoginLeft = () => (
 );
 
 export default function Login() {
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Logged in! (front-end demo only)');
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+      // AuthContext handles redirect to /
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,24 +83,25 @@ export default function Login() {
       </div>
 
       <h2 className="text-2xl font-semibold">Welcome Back!</h2>
-      <p className="mt-1 text-sm text-slate-500">Login to continue buying and selling</p>
+      <p className="mt-1 text-sm text-slate-500">
+        Login to continue buying and selling
+      </p>
 
-      <button className="mt-4 w-full rounded-full border border-slate-200 px-4 py-2 text-sm">
-        Continue with Google
-      </button>
+      {/* Error message */}
+      {error && (
+        <div className="mt-3 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
-      <div className="my-4 flex items-center gap-3 text-xs text-slate-400">
-        <span className="h-px flex-1 bg-slate-200" />
-        <span>or</span>
-        <span className="h-px flex-1 bg-slate-200" />
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-3 text-sm">
+      <form onSubmit={handleSubmit} className="mt-4 space-y-3 text-sm">
         <label className="flex flex-col gap-1 text-slate-700">
           College Email
           <input
             type="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
             placeholder="yourname@college.edu"
           />
@@ -97,6 +112,8 @@ export default function Login() {
           <input
             type="password"
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brandPurple"
             placeholder="Enter your password"
           />
@@ -104,25 +121,21 @@ export default function Login() {
 
         <button
           type="submit"
-          className="mt-1 w-full rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple px-4 py-2 text-sm font-medium text-white"
+          disabled={loading}
+          className="mt-1 w-full rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
-          Login to CampusSwap
+          {loading ? 'Logging in...' : 'Login to CampusSwap'}
         </button>
       </form>
 
       <p className="mt-4 text-xs text-slate-500">
-        Don’t have an account?{' '}
+        Don't have an account?{' '}
         <Link to="/register" className="text-brandPurple">
           Create one
         </Link>
       </p>
-
       <p className="mt-2 text-[11px] text-slate-400">
         🔒 Secure • 🏫 College-Only • 🚫 No Outsiders
-      </p>
-
-      <p className="mt-2 text-[11px] text-slate-500">
-        <Link to="/">← Back to Home</Link>
       </p>
     </AuthLayout>
   );
