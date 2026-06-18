@@ -28,7 +28,7 @@ export default function Chats() {
   // Connect WebSocket
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws`),
       onConnect: () => {
         client.subscribe(`/topic/messages/${user.userId}`, (message) => {
           const msg = JSON.parse(message.body);
