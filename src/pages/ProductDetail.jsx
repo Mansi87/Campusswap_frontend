@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [similar, setSimilar] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,23 +155,32 @@ export default function ProductDetail() {
             )}
 
             <div className="mt-4 flex gap-3">
-              <button
-                onClick={handleChat}
-                className="flex-1 rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90"
-              >
-                💬 Chat with Seller
-              </button>
-              <button
-                onClick={handleLike}
-                disabled={liked}
-                className={`flex h-11 w-11 items-center justify-center rounded-full text-lg shadow-md transition ${
-                  liked ? 'bg-pink-200' : 'bg-pink-100 hover:bg-pink-200'
-                }`}
-              >
-                {liked ? '❤️' : '🤍'}
-              </button>
+               {product.sellerId === user?.userId ? (
+    <div className="flex-1 rounded-full bg-slate-100 py-2.5 text-center text-sm font-medium text-slate-500">
+      📦 This is your listing
+    </div>
+  ) : (
+    <>
+      <button
+        onClick={handleChat}
+        className="flex-1 rounded-full bg-gradient-to-r from-indigo-500 to-brandPurple py-2.5 text-sm font-medium text-white shadow-md hover:opacity-90"
+      >
+        💬 Chat with Seller
+      </button>
+      <button
+        onClick={handleLike}
+        disabled={liked}
+        className={`flex h-11 w-11 items-center justify-center rounded-full text-lg shadow-md transition ${
+          liked ? 'bg-pink-200' : 'bg-pink-100 hover:bg-pink-200'
+        }`}
+      >
+        {liked ? '❤️' : '🤍'}
+      </button>
+    </>
+  )}
             </div>
           </div>
+          
 
           {/* Seller Info */}
           <div className="rounded-3xl bg-white p-5 shadow-lg">

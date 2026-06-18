@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import API from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 
 export default function TopBar() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
   const [search, setSearch] = useState('');
 
@@ -16,7 +17,6 @@ export default function TopBar() {
       } catch { }
     };
     fetchUnread();
-    // Poll every 30 seconds
     const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -27,6 +27,12 @@ export default function TopBar() {
     .join('')
     .toUpperCase()
     .slice(0, 2) || 'U';
+
+  const handleSearch = () => {
+    if (search.trim()) {
+      navigate(`/explore?keyword=${encodeURIComponent(search.trim())}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between bg-white px-8 py-3 shadow-md">
@@ -43,14 +49,10 @@ export default function TopBar() {
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && search.trim()) {
-              window.location.href = `/explore?keyword=${search}`;
-            }
-          }}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
         <button
-          onClick={() => search.trim() && (window.location.href = `/explore?keyword=${search}`)}
+          onClick={handleSearch}
           className="rounded-full bg-brandPurple px-4 py-1 text-sm text-white"
         >
           🔍
