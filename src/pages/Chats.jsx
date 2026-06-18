@@ -243,13 +243,13 @@ export default function Chats() {
             <div className="border-t border-slate-100 p-4">
               <div className="flex items-center gap-3">
                 <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Type a message..."
-                  className="flex-1 rounded-full border border-slate-200 px-4 py-2 text-sm outline-none focus:border-brandPurple"
-                />
+  type="text"
+  value={newMessage}
+  onChange={(e) => setNewMessage(e.target.value)}
+  onKeyDown={handleKeyDown}
+  placeholder="Type a message..."
+  className="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-800 outline-none focus:border-brandPurple"
+/>
                 <button
                   onClick={sendMessage}
                   disabled={!newMessage.trim()}
