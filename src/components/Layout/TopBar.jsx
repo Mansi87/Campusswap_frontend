@@ -10,16 +10,16 @@ export default function TopBar() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        const res = await API.get('/api/chat/unread-count');
-        setUnreadCount(res.data.unreadCount);
-      } catch { }
-    };
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const fetchUnread = async () => {
+    try {
+      const res = await API.get('/api/notifications/unread-count');
+      setUnreadCount(res.data.unreadCount);
+    } catch { }
+  };
+  fetchUnread();
+  const interval = setInterval(fetchUnread, 30000);
+  return () => clearInterval(interval);
+}, []);
 
   const initials = user?.fullName
     ?.split(' ')
@@ -63,10 +63,10 @@ export default function TopBar() {
         <Link to="/notifications" className="relative">
           🔔
           {unreadCount > 0 && (
-            <span className="absolute -right-2 -top-1 rounded-full bg-rose-500 px-1 text-[10px] text-white">
-              {unreadCount}
+            <span className="absolute -right-2 -top-1 flex h-4 w-4 min-w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-medium text-white">
+                {unreadCount > 9 ? '9+' : unreadCount}
             </span>
-          )}
+           )}
         </Link>
         <Link to="/settings">⚙️</Link>
         <Link
