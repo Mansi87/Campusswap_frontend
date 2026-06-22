@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../api/axios';
+import { compressImage } from '../utils/imageCompressor';
 
 const CATEGORIES = [
   'Electronics', 'Books', 'Furniture', 'Stationery',
@@ -32,29 +33,34 @@ export default function CreateListing() {
   };
 
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    if (files.length > 4) {
-      setError('Maximum 4 images allowed');
-      return;
-    }
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+  if (files.length > 4) {
+    setError('Maximum 4 images allowed');
+    return;
+  }
 
-    setUploadingImages(true);
-    setError('');
-    try {
-      const formDataImg = new FormData();
-      files.forEach(file => formDataImg.append('files', file));
+  setUploadingImages(true);
+  setError('');
+  try {
+    // Compress before uploading
+    const compressedFiles = await Promise.all(
+      files.map(file => compressImage(file, 1))
+    );
 
-      const res = await API.post('/api/upload/images', formDataImg, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setImages(res.data.urls);
-    } catch (err) {
-      setError('Image upload failed. Try again.');
-    } finally {
-      setUploadingImages(false);
-    }
-  };
+    const formDataImg = new FormData();
+    compressedFiles.forEach(file => formDataImg.append('files', file));
+
+    const res = await API.post('/api/upload/images', formDataImg, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setImages(prev => [...prev, ...res.data.urls].slice(0, 4));
+  } catch (err) {
+    setError('Image upload failed. Try again.');
+  } finally {
+    setUploadingImages(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

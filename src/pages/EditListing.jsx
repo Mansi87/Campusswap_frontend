@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../api/axios';
+import { compressImage } from '../utils/imageCompressor';
 
 const CATEGORIES = [
   'Electronics', 'Books', 'Furniture', 'Stationery',
@@ -53,22 +54,25 @@ export default function EditListing() {
   };
 
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    setUploadingImages(true);
-    try {
-      const formDataImg = new FormData();
-      files.forEach(file => formDataImg.append('files', file));
-      const res = await API.post('/api/upload/images', formDataImg, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setImages(prev => [...prev, ...res.data.urls].slice(0, 4));
-    } catch {
-      setError('Image upload failed');
-    } finally {
-      setUploadingImages(false);
-    }
-  };
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+  setUploadingImages(true);
+  try {
+    const compressedFiles = await Promise.all(
+      files.map(file => compressImage(file, 1))
+    );
+    const formDataImg = new FormData();
+    compressedFiles.forEach(file => formDataImg.append('files', file));
+    const res = await API.post('/api/upload/images', formDataImg, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setImages(prev => [...prev, ...res.data.urls].slice(0, 4));
+  } catch {
+    setError('Image upload failed');
+  } finally {
+    setUploadingImages(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
