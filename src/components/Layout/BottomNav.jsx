@@ -9,7 +9,7 @@ export default function BottomNav() {
     }`;
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-20 flex h-16 w-full max-w-3xl -translate-x-1/2 items-center justify-between rounded-t-3xl bg-white px-10 shadow-[0_-12px_30px_rgba(15,23,42,0.2)]">
+    <nav className="fixed bottom-0 left-1/2 z-20 flex h-16 w-full max-w-3xl -translate-x-1/2 items-center justify-between rounded-t-3xl bg-white px-8 shadow-[0_-12px_30px_rgba(15,23,42,0.2)]">
       <Link to="/" className={itemClasses('/')}>
         <span>🏠</span>
         <span>Home</span>
@@ -20,16 +20,17 @@ export default function BottomNav() {
         <span>Likes</span>
       </Link>
 
+      {/* + button — now opens modal via state */}
       <Link
-  to="/create-listing"
-  className="flex h-14 w-14 -translate-y-5 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-brandPurple text-3xl text-white shadow-xl"
->
-  +
-</Link>
+        to="/create"
+        className="flex h-14 w-14 -translate-y-5 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-brandPurple text-3xl text-white shadow-xl"
+      >
+        +
+      </Link>
 
-      <Link to="/explore" className={itemClasses('/explore')}>
-        <span>🔍</span>
-        <span>Explore</span>
+      <Link to="/notes" className={itemClasses('/notes')}>
+        <span>📚</span>
+        <span>Notes</span>
       </Link>
 
       <Link to="/chats" className={itemClasses('/chats')}>

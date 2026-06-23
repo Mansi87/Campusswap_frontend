@@ -17,6 +17,11 @@ import Register from './pages/Register.jsx';
 import EditListing from './pages/EditListing.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 
+import CreateChoice from './pages/CreateChoice.jsx';
+import CreateNotes from './pages/CreateNotes.jsx';
+import Notes from './pages/Notes.jsx';
+import NoteDetail from './pages/NoteDetail.jsx';
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -55,6 +60,10 @@ export default function App() {
         <Route path="/create-listing" element={<CreateListing />} />
         <Route path="/edit-listing/:productId" element={<EditListing />} />
         <Route path="/product/:productId" element={<ProductDetail />} />
+        <Route path="/create" element={<CreateChoice />} />
+        <Route path="/create-notes" element={<CreateNotes />} />
+        <Route path="/notes" element={<Notes />} />
+        <Route path="/notes/:noteId" element={<NoteDetail />} />
       </Route>
 
       <Route path="/login" element={<Login />} />
